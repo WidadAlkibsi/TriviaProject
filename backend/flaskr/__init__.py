@@ -3,7 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
-
+import unittest
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
@@ -30,7 +30,7 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
-  @app.route('/categories')
+  @app.route('/categories', methods=['GET'])
   def retrieve_categories():
     categories = Category.query.all()
     formatted_categories = [category.format() for category in categories]
@@ -58,13 +58,17 @@ def create_app(test_config=None):
   Clicking on the page numbers should update the questions. 
   '''
 
-  @app.route('/questions')
+  @app.route('/questions' , methods=['GET'])
   def retrieve_questions():
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * 10
     end = start + 10
     questions = Question.query.all()
+    # categories = Question.category.query.all()
     formatted_questions = [question.format() for question in questions]
+    # formatted_categories = [ formatted_questions.category for category in categories]
+    categories = Category.query.all()
+    formatted_categories = [category.format() for category in categories]
 
     if len(formatted_questions) == 0:
       abort(404)  #Not found
@@ -72,8 +76,11 @@ def create_app(test_config=None):
     return jsonify({
       'success' : True, 
       'questions': formatted_questions[start:end],
-      'total questions': len(formatted_questions)
+      'total questions': len(formatted_questions),
+      'categories': formatted_categories,
+      # 'categories': formatted_categories
     })
+
 
   '''
   @TODO: 
@@ -82,6 +89,27 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
+
+  @app.route('/questions/<int:question_id>' , methods=['DELETE'])
+  def delete_question(question_id):
+    try: 
+      question = Question.query.filter(Question.id == question_id).one_or_none()
+
+      if question is None:
+        abort(404) #404 Not Found
+
+      question.delete()
+      qst = Question.query.order_by(Question.id).all()
+      current_questions = [question.format() for question in qst]
+
+      return jsonify({
+        'success' : True, 
+        'deleted' : question_id, 
+        'questions': current_questions,
+        'total questions': len(current_questions)
+      })
+    except: 
+      abort(422) 
 
   '''
   @TODO: 
@@ -93,6 +121,8 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+ 
+
 
   '''
   @TODO: 
