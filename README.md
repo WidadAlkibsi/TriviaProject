@@ -1,4 +1,5 @@
 # Full Stack API Final Project
+Trivia is a website that has Questions in different categories (for example: Science Questions, Art Questions...etc) with different difficulty levels. You can also delete some questions and add questions of your own. Also, you get to do a trivia quiz. 
 
 ## Full Stack Trivia
 

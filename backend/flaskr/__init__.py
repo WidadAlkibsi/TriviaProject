@@ -12,35 +12,28 @@ def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
   setup_db(app)
-  '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-  '''
+  
   cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-  '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
+ 
   @app.after_request
   def after_request(response): 
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
     response.headers.add('Access-Control-Allow-Methods', 'POST,PATCH,GET,DELETE,OPTIONS')
     return response
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  '''
+ 
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():
     categories = Category.query.all()
-    formatted_categories = [category.format() for category in categories]
+    categs = {cat.id:cat.type for cat in categories}
+    # formatted_categories = [category.format() for category in categories]
 
-    if len(formatted_categories) == 0:
+    if len(categs) == 0:
       abort(404)  #Not found
     
     return jsonify({
       'success' : True, 
-      'categories': formatted_categories,
+      'categories': categs,
       # 'total categories': len(formatted_categories)
     })
 
@@ -83,13 +76,7 @@ def create_app(test_config=None):
     })
 
 
-  '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
-
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-  '''
+ 
 
   @app.route('/questions/<int:question_id>' , methods=['DELETE'])
   def delete_question(question_id):
@@ -101,6 +88,8 @@ def create_app(test_config=None):
 
       question.delete()
       qst = Question.query.order_by(Question.id).all()
+      # quests = {question.id:question.type for question in qst}
+
       current_questions = [question.format() for question in qst]
 
       return jsonify({
@@ -160,43 +149,6 @@ def create_app(test_config=None):
     except:
          abort(422) # Unprocessable Entity
 
-
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
-
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
-  # @app.route('/questions/search', methods=['POST'])
-  # def search_questions():
-  #   body = request.get_json()
-  #   search = body.get('search', None)
-
-  #   page = request.args.get('page', 1, type=int)
-  #   start = (page - 1) * 10 
-  #   end = start + 10
-
-  #   selection = searched_question=Question.query.filter(Question.question.ilike('%{}%'.format(search)).all())
-  #   current_quests = [question.format() for question in selection]
-  #   try: 
-
-  #    if search is None:
-  #     abort(404)
-  
-    
-  #    return jsonify ({
-  #       'questions' : current_quests[start:end] ,
-  #       'total_questions' : len(current_quests) ,
-  #       'success' : True 
-      
-  #      })
-  #   except: 
-  #     abort(422)
-  # return app
 
   '''
   @TODO: 

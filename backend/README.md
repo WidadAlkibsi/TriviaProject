@@ -1,8 +1,13 @@
 # Full Stack Trivia API Backend
 
+
 ## Getting Started
 
+Base URL: The backend is hosted at the default: http://127.0.0.1:5000/ 
+
 ### Installing Dependencies
+Make sure to have python, pip, node, and npm installed for this project.
+Also make sure you install the dependencies from the requirements.txt. 
 
 #### Python 3.7
 
@@ -72,9 +77,11 @@ This README is missing documentation of your endpoints. Below is an example for 
 
 Endpoints
 GET '/categories'
-GET ...
-POST ...
-DELETE ...
+GET '/questions'
+GET '/categories/<int:category_id>/questions'
+POST '/questions'
+POST '/quizzes'
+DELETE '/questions/<int:question_id>'
 
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
