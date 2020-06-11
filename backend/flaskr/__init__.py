@@ -5,14 +5,17 @@ from flask_cors import CORS
 import random
 import unittest
 from models import setup_db, Question, Category
+import logging
+
+
 
 QUESTIONS_PER_PAGE = 10
 
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
+  logging.basicConfig(level=logging.DEBUG)
   setup_db(app)
-  
   cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
  
   @app.after_request
@@ -126,7 +129,6 @@ def create_app(test_config=None):
     except:
          abort(422) # Unprocessable Entity
 
-
   
   @app.route('/categories/<int:category_id>/questions' , methods=['GET'])
   def get_questions_basedon_category(category_id):
@@ -135,15 +137,15 @@ def create_app(test_config=None):
     start = (page - 1) * 10
     end = start + 1
 
-    categ = Category.query.filter_by(id == category_id).one_or_none()
+    # categ = Category.query.filter_by(id == category_id).one_or_none()
     questions = Question.query.filter(Question.category == category_id).all()
     formatted_questions = [question.format() for question in questions]
-    formatted_category = categ.format()
+    # formatted_category = categ.format()
 
     if not questions:
         abort(404) 
-    if not categ:
-        abort(404)  
+    # if not categ:
+    #     abort(404)  
     
     return jsonify({
         'success' : True, 
@@ -157,8 +159,8 @@ def create_app(test_config=None):
   @app.route('/quizzes', methods=['POST'])
   def play_quiz():
     body = request.get_json()
-    previous_question = body.get('previousQuestions', None)
-    quiz_category = body.get('quizCategory', None)
+    previous_question = body.get('previous_questions', None)
+    quiz_category = body.get('quiz_category', None)
 
     if previous_question is None or quiz_category is None:
       abort(400)
